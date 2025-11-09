@@ -16,3 +16,5 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+console.log("VITE_FIREBASE_API_KEY in build:", import.meta.env.VITE_FIREBASE_API_KEY);
