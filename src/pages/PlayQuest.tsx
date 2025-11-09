@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getQuest } from "../lib/store";
 import type { Quest } from "../types";
+import { db } from "../lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import PageWrapper from "../components/PageWrapper";
 
 export default function PlayQuest() {
@@ -12,19 +14,27 @@ export default function PlayQuest() {
   const [guess, setGuess] = useState("");
   const current = useMemo(() => quest?.questions[idx], [quest, idx]);
 
-  useEffect(() => {
-    if (!questId) return;
-    const q = getQuest(questId);
-    setQuest(q);
-  }, [questId]);
+useEffect(() => {
+  const fetchQuest = async () => {
+    if (!questId) return ;
+    try {
+      const ref = doc(db, "quests", questId);
+      const snap = await getDoc(ref);
 
-  if (!quest) {
-    return (
-      <div className="h-screen grid place-items-center bg-slate-950 text-slate-100">
-        <div>No quest found.</div>
-      </div>
-    );
-  }
+      if (snap.exists()) {
+        setQuest(snap.data() as Quest);
+      } else {
+        console.warn("No quest found.");
+        setQuest(null);
+      }
+    } catch (err) {
+      console.error("Failed to load quest:", err);
+    }
+  };
+
+  fetchQuest();
+}, [questId]);
+
 
 const check = () => {
   if (!current) return;

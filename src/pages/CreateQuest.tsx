@@ -5,6 +5,8 @@ import { saveQuest } from "../lib/store";
 import type { Question, Quest } from "../types";
 import PageWrapper from "../components/PageWrapper";
 import { motion } from "framer-motion";
+import { db } from "../lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function CreateQuest() {
   const [title, setTitle] = useState("");
@@ -23,23 +25,29 @@ export default function CreateQuest() {
   const removeQuestion = (id: string) =>
     setQuestions((qs) => qs.filter(q => q.id !== id));
 
-  const handleCreate = () => {
-    const clean = questions
-      .filter(q => q.prompt.trim() && q.answer.trim())
-      .map(q => ({ ...q, prompt: q.prompt.trim(), answer: q.answer.trim() }));
+  const handleCreate = async () => {
+  const clean = questions
+    .filter((q) => q.prompt.trim() && q.answer.trim())
+    .map((q) => ({
+      prompt: q.prompt.trim(),
+      answer: q.answer.trim(),
+    }));
 
-    const quest: Quest = {
-      id: nanoid(10),
-      title: title.trim() || "Untitled Quest",
-      reward: reward.trim(),
-      questions: clean,
-      createdAt: Date.now(),
-    };
-
-    saveQuest(quest);
-    const url = `${window.location.origin}/play/${quest.id}`;
-    setCreatedLink(url);
+const questId = nanoid();
+  const quest = {
+    title: title.trim() || "Untitled Quest",
+    reward,
+    questions: clean,
+    createdAt: Date.now(),
   };
+
+  // Save to Firestore
+  await setDoc(doc(db, "quests", questId), quest);
+
+  // Generate link to play
+  const url = `${window.location.origin}/play/${questId}`;
+  setCreatedLink(url);
+};
 
   return (
     <PageWrapper>
