@@ -1,0 +1,19 @@
+import { Link } from "react-router-dom"
+
+export default function App() {
+  return (
+    <div className="h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+      <h1 className="text-5xl font-bold text-blue-400 mb-8">
+        QR Quest 🔍
+      </h1>
+      <div className="flex flex-col gap-4">
+        <Link to="/create" className="bg-blue-500 px-6 py-3 rounded hover:bg-blue-600">
+          Create a Quest
+        </Link>
+        <Link to="/play/123" className="bg-green-500 px-6 py-3 rounded hover:bg-green-600">
+          Play a Quest
+        </Link>
+      </div>
+    </div>
+  )
+}
